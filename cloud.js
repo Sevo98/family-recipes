@@ -4,12 +4,12 @@
  const URL='https://fckkbcxaghwuyapszwap.supabase.co/rest/v1/family_shared_state';
  const KEY='sb_publishable_N2L5T5GR0UECfCuhRDMoBg_iNxpASMp';
  const STORE='family-recipes-shared-v1';let baseline=bridge.read(),journal={pending:{}},running=false,initializing=true;
- const headers={apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'};
+ const headers={apikey:KEY};
  const panel=el('cloud-panel');panel.innerHTML='<h2 style="margin-top:0">Общий список покупок</h2><p>Галочки, размер порций, перекусы и выбор салатов сохраняются в общей базе и появятся на других устройствах с этим сайтом.</p><p class="note"><b>Общий доступ:</b> поскольку вход не требуется, любой посетитель публичного сайта сможет видеть и менять эти сохранения.</p><div class="tools"><button id="cloud-refresh">Обновить общий список</button></div><p id="cloud-status" role="status" aria-live="polite">Подключаем базу…</p><p><small>Офлайн-изменения сохраняются на этом устройстве и отправляются после подключения. Если одну позицию одновременно меняют с двух устройств, остаётся последнее отправленное значение.</small></p>';
  const status=text=>el('cloud-status').textContent=text;
  const read=()=>{try{return JSON.parse(localStorage.getItem(STORE))||{pending:{}};}catch{return {pending:{}};}};
  function persist(){try{localStorage.setItem(STORE,JSON.stringify(journal));return true;}catch{status('Не удалось сохранить очередь на устройстве. Не закрывайте страницу до синхронизации.');return false;}}
- async function request(path='',options={}){const response=await fetch(URL+path,{...options,headers:{...headers,...options.headers}});if(!response.ok)throw new Error('Supabase '+response.status);return response.status===204?null:response.json();}
+ async function request(path='',options={}){const response=await fetch(URL+path,{...options,headers:{...headers,...options.headers,...(options.body?{'Content-Type':'application/json'}:{})}});if(!response.ok)throw new Error('Supabase '+response.status);return response.status===204?null:response.json();}
  const fetchRows=()=>request('?select=key,value&limit=2000');
  async function push(batch){const rows=Object.entries(batch).map(([key,op])=>({key,value:op.value}));if(rows.length)await request('?on_conflict=key',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});}
  function changed(){const next=bridge.read();for(const key of new Set([...Object.keys(baseline),...Object.keys(next)])){if(JSON.stringify(baseline[key])!==JSON.stringify(next[key]))journal.pending[key]={value:next[key]??null,id:Date.now()+Math.random()};}baseline=next;persist();if(!initializing)void sync();}
