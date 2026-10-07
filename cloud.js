@@ -23,7 +23,7 @@
    for(const [key,op]of Object.entries(journal.pending))remote[key]=op.value;
    if(JSON.stringify(remote)!==JSON.stringify(journal.cached)){bridge.apply(remote);baseline=bridge.read();}
    journal.cached=remote;persist();status(Object.keys(journal.pending).length?'Новые изменения ждут отправки…':'Общий список синхронизирован · '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
-  }catch(error){status('Не удалось синхронизировать. Изменения сохранены на этом устройстве. Проверьте интернет или нажмите кнопку повтора.');}
+  }catch(error){status('Ошибка синхронизации: '+(error?.message||String(error)));}
   finally{running=false;}
  }
  async function initialize(){
@@ -34,7 +34,7 @@
    const remote=Object.fromEntries(rows.map(row=>[row.key,row.value]));for(const [key,op]of Object.entries(journal.pending))remote[key]=op.value;
    if(rows.length||Object.keys(journal.pending).length){bridge.apply(remote);baseline=bridge.read();}
    journal.cached=remote;journal.initialized=true;persist();initializing=false;await sync();
-  }catch(error){initializing=false;status('Нет связи с базой. Меню работает локально, синхронизация повторится при подключении.');}
+  }catch(error){initializing=false;status('Ошибка подключения: '+(error?.message||String(error)));}
  }
  el('cloud-refresh').onclick=()=>void sync();window.addEventListener('recipe-change',changed);window.addEventListener('online',()=>void sync());document.addEventListener('visibilitychange',()=>{if(!document.hidden)void sync();});setInterval(()=>{if(!document.hidden)void sync();},15000);void initialize();
 })();
