@@ -1,4 +1,4 @@
-const CACHE='family-recipes-pwa-v5';
+const CACHE='family-recipes-pwa-v6';
 const ASSETS=['./','./index.html','./pwa.js','./cloud.js','./supabase-2.117.2.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 const allowed=new Set(ASSETS.map(path=>new URL(path,self.registration.scope).href));
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
