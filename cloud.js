@@ -9,9 +9,12 @@
  const status=text=>{el('cloud-status').textContent=text;const inline=el('save-status');if(inline)inline.textContent=text;};
  const read=()=>{try{return JSON.parse(localStorage.getItem(STORE))||{pending:{}};}catch{return {pending:{}};}};
  function persist(){try{localStorage.setItem(STORE,JSON.stringify(journal));return true;}catch{status('Не удалось сохранить очередь на устройстве. Не закрывайте страницу до синхронизации.');return false;}}
- async function request(path='',options={}){const response=await fetch(URL+path,{...options,signal:AbortSignal.timeout(15000),headers:{...headers,...options.headers,...(options.body?{'Content-Type':'application/json'}:{})}});if(!response.ok)throw new Error('Supabase '+response.status);if(response.status===204)return null;const body=await response.text();return body?JSON.parse(body):null;}
+ async function request(path='',options={}){const response=await fetch(URL+path,{...options,signal:AbortSignal.timeout(15000),headers:{...headers,...options.headers,...(options.body?{'Content-Type':'application/json'}:{})}});if(!response.ok){let detail='';try{detail=await response.text();}catch{}let msg='Supabase '+response.status;try{const parsed=JSON.parse(detail);if(parsed?.message)msg+=' · '+parsed.message;}catch{if(detail)msg+=' · '+detail.slice(0,160);}throw new Error(msg);}if(response.status===204)return null;const body=await response.text();return body?JSON.parse(body):null;}
  const fetchRows=()=>request('?select=key,value&limit=2000');
- async function push(batch){const rows=Object.entries(batch).map(([key,op])=>({key,value:op.value}));if(rows.length)await request('?on_conflict=key',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});}
+ // Cleared keys must not be written as null: the value column is NOT NULL.
+ // false is a tombstone that apply() ignores for checks/salads; snacks uses boolean false as a real value.
+ function mergePending(remote){for(const [key,op]of Object.entries(journal.pending)){if(op.value===null||op.value===undefined)delete remote[key];else remote[key]=op.value;}return remote;}
+ async function push(batch){const rows=Object.entries(batch).map(([key,op])=>({key,value:op.value??false}));if(rows.length)await request('?on_conflict=key',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});}
  function changed(){const next=bridge.read();for(const key of new Set([...Object.keys(baseline),...Object.keys(next)])){if(JSON.stringify(baseline[key])!==JSON.stringify(next[key]))journal.pending[key]={value:next[key]??null,id:Date.now()+Math.random()};}baseline=next;persist();if(!initializing){status(navigator.onLine?'Отметка сохранена на устройстве · отправляем в общую базу…':'Нет интернета. Отметка сохранена на устройстве и отправится после подключения.');void sync();}}
  async function sync(){
   if(initializing)return;if(running){rerun=true;return;}if(!navigator.onLine){status('Нет интернета. Изменения сохранены на устройстве и отправятся после подключения.');return;}
@@ -19,8 +22,7 @@
   try{
    status('Синхронизация общего списка…');const batch={...journal.pending},keys=Object.keys(batch);await push(batch);
    for(const key of keys)if(journal.pending[key]?.id===batch[key].id)delete journal.pending[key];persist();
-   const rows=await fetchRows(),remote=Object.fromEntries(rows.map(row=>[row.key,row.value]));
-   for(const [key,op]of Object.entries(journal.pending))remote[key]=op.value;
+   const rows=await fetchRows(),remote=mergePending(Object.fromEntries(rows.map(row=>[row.key,row.value])));
    if(JSON.stringify(remote)!==JSON.stringify(journal.cached)){bridge.apply(remote);baseline=bridge.read();}
    journal.cached=remote;persist();succeeded=true;status(Object.keys(journal.pending).length?'Отправляем новые изменения…':'Изменения сохранены в общей базе · '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
   }catch(error){status('Ошибка синхронизации: '+(error?.message||String(error)));}
@@ -31,7 +33,7 @@
   try{
    status('Подключаем общий список…');const rows=await fetchRows();
    if(rows.length===0&&!journal.initialized){for(const [key,value]of Object.entries(local))journal.pending[key]={value,id:Date.now()+Math.random()};}
-   const remote=Object.fromEntries(rows.map(row=>[row.key,row.value]));for(const [key,op]of Object.entries(journal.pending))remote[key]=op.value;
+   const remote=mergePending(Object.fromEntries(rows.map(row=>[row.key,row.value])));
    if(rows.length||Object.keys(journal.pending).length){bridge.apply(remote);baseline=bridge.read();}
    journal.cached=remote;journal.initialized=true;persist();initializing=false;await sync();
   }catch(error){initializing=false;status('Ошибка подключения: '+(error?.message||String(error)));}
