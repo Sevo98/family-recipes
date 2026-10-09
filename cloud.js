@@ -34,3 +34,7 @@
    const remote=Object.fromEntries(rows.map(row=>[row.key,row.value]));for(const [key,op]of Object.entries(journal.pending))remote[key]=op.value;
    if(rows.length||Object.keys(journal.pending).length){bridge.apply(remote);baseline=bridge.read();}
    journal.cached=remote;journal.initialized=true;persist();initializing=false;await sync();
+  }catch(error){initializing=false;status('Ошибка подключения: '+(error?.message||String(error)));}
+ }
+ el('cloud-refresh').onclick=()=>void sync();window.addEventListener('recipe-change',changed);window.addEventListener('online',()=>void sync());document.addEventListener('visibilitychange',()=>{if(!document.hidden)void sync();});setInterval(()=>{if(!document.hidden)void sync();},15000);void initialize();
+})();
