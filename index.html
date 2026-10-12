@@ -302,21 +302,6 @@ $('salad-kind').addEventListener('change',renderSalads);$('salad-search').addEve
 $('expand-salads').onclick=()=>document.querySelectorAll('#salad-list .recipe-detail').forEach(e=>e.open=true);
 $('collapse-salads').onclick=()=>document.querySelectorAll('#salad-list .recipe-detail').forEach(e=>e.open=false);
 document.querySelectorAll('[data-salad-main]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRecipe(a.dataset.saladMain);}));
-(function setupJumpNav(){
- const panel=$('jump-nav-panel'),toggle=$('jump-nav-toggle'),closeBtn=$('jump-nav-close');
- if(!panel||!toggle)return;
- function setOpen(open){
-  panel.hidden=!open;
-  toggle.setAttribute('aria-expanded',open?'true':'false');
-  toggle.setAttribute('aria-label',open?'Закрыть навигацию по разделам':'Открыть навигацию по разделам');
- }
- function close(){setOpen(false);}
- toggle.addEventListener('click',()=>setOpen(panel.hidden));
- closeBtn.addEventListener('click',close);
- panel.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close();});
- document.addEventListener('click',e=>{if(!panel.hidden&&!e.target.closest('#jump-nav'))close();});
-})();
 renderRecipes();renderSalads();renderShop();renderToday();save();
 // К каждому приёму пищи в исходном меню добавляем переход к рецепту.
 const mainTable=document.querySelector('#menu + p + .scroll table');
@@ -375,5 +360,22 @@ save=function(){localSave();window.dispatchEvent(new Event('recipe-change'));};
 </div>
 <button type="button" id="jump-nav-toggle" aria-expanded="false" aria-controls="jump-nav-panel" title="Навигация по разделам" aria-label="Открыть навигацию по разделам">☰</button>
 </div>
+<script>
+(function(){
+ const panel=document.getElementById('jump-nav-panel'),toggle=document.getElementById('jump-nav-toggle'),closeBtn=document.getElementById('jump-nav-close');
+ if(!panel||!toggle)return;
+ function setOpen(open){
+  panel.hidden=!open;
+  toggle.setAttribute('aria-expanded',open?'true':'false');
+  toggle.setAttribute('aria-label',open?'Закрыть навигацию по разделам':'Открыть навигацию по разделам');
+ }
+ function close(){setOpen(false);}
+ toggle.addEventListener('click',e=>{e.stopPropagation();setOpen(panel.hidden);});
+ closeBtn.addEventListener('click',e=>{e.stopPropagation();close();});
+ panel.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close();});
+ document.addEventListener('click',e=>{if(!panel.hidden&&!e.target.closest('#jump-nav'))close();});
+})();
+</script>
 <script src="./supabase-2.117.2.js"></script><script src="./cloud.js?v=empty-body-20261009"></script><script src="./pwa.js"></script></body></html>
 
