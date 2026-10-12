@@ -7,14 +7,32 @@
  const headers={apikey:KEY,Authorization:'Bearer '+KEY};
  let deviceId='', likedIds=new Set(), ready=false, loading=null;
 
+ function clone(value){
+  try{if(typeof structuredClone==='function')return structuredClone(value);}catch{}
+  return JSON.parse(JSON.stringify(value));
+ }
+ function uuid(){
+  try{if(crypto&&typeof crypto.randomUUID==='function')return crypto.randomUUID();}catch{}
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&0x3|0x8)).toString(16);});
+ }
+ function timeoutSignal(ms){
+  if(typeof AbortSignal!=='undefined'&&typeof AbortSignal.timeout==='function'){
+   try{return AbortSignal.timeout(ms);}catch{}
+  }
+  if(typeof AbortController==='undefined')return undefined;
+  const controller=new AbortController();
+  setTimeout(()=>{try{controller.abort();}catch{}},ms);
+  return controller.signal;
+ }
+
  function seedMenu(){
   const seed=window.MENU_SEED;
   if(!seed)throw new Error('MENU_SEED missing');
   return {
-   products:structuredClone(seed.products),
-   recipes:seed.recipes.map(r=>({...structuredClone(r),likesCount:0,liked:false,description:r.description||'',isCustom:!!r.isCustom})),
-   saladMeals:structuredClone(seed.saladMeals),
-   saladPlan:structuredClone(seed.saladPlan)
+   products:clone(seed.products),
+   recipes:seed.recipes.map(r=>({...clone(r),likesCount:0,liked:false,description:r.description||'',isCustom:!!r.isCustom})),
+   saladMeals:clone(seed.saladMeals),
+   saladPlan:clone(seed.saladPlan)
   };
  }
 
@@ -26,14 +44,14 @@
    copy.likesCount=Number(copy.likesCount||copy.likes_count||0);
    copy.liked=likedIds.has(copy.id);
    copy.description=copy.description||'';
-   copy.isCustom=!!(copy.isCustom??copy.is_custom);
+   copy.isCustom=!!(copy.isCustom!=null?copy.isCustom:copy.is_custom);
    return copy;
   });
   const next={
    products:catalog.products,
    recipes,
-   saladMeals:catalog.saladMeals||window.MENU_SEED.saladMeals,
-   saladPlan:catalog.saladPlan||window.MENU_SEED.saladPlan
+   saladMeals:catalog.saladMeals||(window.MENU_SEED&&window.MENU_SEED.saladMeals)||{},
+   saladPlan:catalog.saladPlan||(window.MENU_SEED&&window.MENU_SEED.saladPlan)||{}
   };
   // Keep the same object reference as the inline app script's MENU.
   if(window.MENU&&typeof window.MENU==='object'){
@@ -48,22 +66,25 @@
   try{return JSON.parse(localStorage.getItem(CACHE)||'null');}catch{return null;}
  }
  function writeCache(catalog){
-  try{localStorage.setItem(CACHE,JSON.stringify({products:catalog.products,recipes:catalog.recipes.map(({liked,...r})=>r),saladMeals:catalog.saladMeals,saladPlan:catalog.saladPlan,savedAt:Date.now()}));}catch{}
+  try{localStorage.setItem(CACHE,JSON.stringify({products:catalog.products,recipes:catalog.recipes.map(r=>{const copy={...r};delete copy.liked;return copy;}),saladMeals:catalog.saladMeals,saladPlan:catalog.saladPlan,savedAt:Date.now()}));}catch{}
  }
  function ensureDeviceId(){
   try{
    deviceId=localStorage.getItem(DEVICE)||'';
-   if(!/^[0-9a-f-]{36}$/i.test(deviceId)){deviceId=crypto.randomUUID();localStorage.setItem(DEVICE,deviceId);}
+   if(!/^[0-9a-f-]{36}$/i.test(deviceId)){deviceId=uuid();localStorage.setItem(DEVICE,deviceId);}
   }catch{deviceId=deviceId||('temp-'+Math.random().toString(16).slice(2));}
   return deviceId;
  }
 
  async function request(path,options={}){
-  const response=await fetch(BASE+path,{...options,signal:AbortSignal.timeout(20000),headers:{...headers,...options.headers,...(options.body?{'Content-Type':'application/json'}:{})}});
+  const opts={...options,headers:{...headers,...options.headers,...(options.body?{'Content-Type':'application/json'}:{})}};
+  const signal=timeoutSignal(20000);
+  if(signal)opts.signal=signal;
+  const response=await fetch(BASE+path,opts);
   if(!response.ok){
    let detail='';try{detail=await response.text();}catch{}
    let msg='Supabase '+response.status;
-   try{const parsed=JSON.parse(detail);if(parsed?.message)msg+=' · '+parsed.message;}catch{if(detail)msg+=' · '+detail.slice(0,180);}
+   try{const parsed=JSON.parse(detail);if(parsed&&parsed.message)msg+=' · '+parsed.message;}catch{if(detail)msg+=' · '+detail.slice(0,180);}
    throw new Error(msg);
   }
   if(response.status===204)return null;
@@ -86,7 +107,7 @@
    isCustom:!!row.is_custom,
    likesCount:Number(row.likes_count)||0,
    liked:likedIds.has(row.id),
-   ingredients:(ingredients||[]).slice().sort((a,b)=>(a.sort_order-b.sort_order)||a.product_id.localeCompare(b.product_id)).map(x=>[x.product_id,Number(x.quantity)])
+   ingredients:(ingredients||[]).slice().sort((a,b)=>(a.sort_order-b.sort_order)||String(a.product_id).localeCompare(String(b.product_id))).map(x=>[x.product_id,Number(x.quantity)])
   };
  }
 
@@ -97,7 +118,7 @@
    group:row.group_key||row.group,
    note:row.note||'',
    category:row.category||'other',
-   kcal_per_100:row.kcal_per_100??null
+   kcal_per_100:row.kcal_per_100==null?null:row.kcal_per_100
   };
  }
 
@@ -110,15 +131,18 @@
   ]);
   likedIds=new Set((likes||[]).map(x=>x.recipe_id));
   const byRecipe={};
-  for(const row of ingredients||[]){(byRecipe[row.recipe_id]||=[]).push(row);}
+  for(const row of ingredients||[]){
+   if(!byRecipe[row.recipe_id])byRecipe[row.recipe_id]=[];
+   byRecipe[row.recipe_id].push(row);
+  }
   const productMap={};
   for(const row of products||[])productMap[row.id]=toClientProduct(row);
   const recipeList=(recipes||[]).map(row=>toClientRecipe(row,byRecipe[row.id]||[]));
   return {
    products:productMap,
    recipes:recipeList,
-   saladMeals:window.MENU_SEED.saladMeals,
-   saladPlan:window.MENU_SEED.saladPlan
+   saladMeals:(window.MENU_SEED&&window.MENU_SEED.saladMeals)||{},
+   saladPlan:(window.MENU_SEED&&window.MENU_SEED.saladPlan)||{}
   };
  }
 
@@ -127,7 +151,6 @@
   const productRows=Object.entries(seed.products).map(([id,p])=>({
    id,name:p.name,unit:p.unit,group_key:p.group,category:p.category||'other',note:p.note||'',kcal_per_100:null
   }));
-  // Upsert in chunks to stay under payload limits.
   for(let i=0;i<productRows.length;i+=40){
    await request('/products?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(productRows.slice(i,i+40))});
   }
@@ -145,9 +168,8 @@
     ingredientRows.push({recipe_id:r.id,product_id,quantity,sort_order,note:''});
    });
   }
-  // Clear then insert — ignore failures on empty delete.
   for(const r of seed.recipes){
-   try{await request('/recipe_ingredients?recipe_id=eq.'+encodeURIComponent(r.id),{method:'DELETE',headers:{Prefer:'return=minimal'}});}catch{}
+   try{await request('/recipe_ingredients?recipe_id=eq.'+encodeURIComponent(r.id),{method:'DELETE',headers:{Prefer:'return=minimal'}});}catch(e){}
   }
   for(let i=0;i<ingredientRows.length;i+=80){
    await request('/recipe_ingredients',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(ingredientRows.slice(i,i+80))});
@@ -162,33 +184,48 @@
   window.dispatchEvent(new Event('catalog-change'));
  }
 
+ function setCatalogStatus(text){
+  const el=document.getElementById('catalog-status');
+  if(el)el.textContent=text||'';
+ }
+
  async function load(){
   if(loading)return loading;
   loading=(async()=>{
    ensureDeviceId();
-   const cached=readCache();
-   if(cached?.products&&cached?.recipes?.length){
-    likedIds=new Set((cached.recipes||[]).filter(r=>r.liked).map(r=>r.id));
-    applyToWindow(cached);
-    ready=true;
-    window.dispatchEvent(new Event('catalog-ready'));
-   }else{
-    const local=seedMenu();
-    applyToWindow(local);
-    ready=true;
-    window.dispatchEvent(new Event('catalog-ready'));
-   }
-   if(!navigator.onLine){loading=null;return window.MENU;}
    try{
+    const cached=readCache();
+    if(cached&&cached.products&&cached.recipes&&cached.recipes.length){
+     likedIds=new Set((cached.recipes||[]).filter(r=>r.liked).map(r=>r.id));
+     applyToWindow(cached);
+     ready=true;
+     window.dispatchEvent(new Event('catalog-ready'));
+    }else{
+     const local=seedMenu();
+     applyToWindow(local);
+     ready=true;
+     window.dispatchEvent(new Event('catalog-ready'));
+    }
+   }catch(error){
+    console.warn('Local catalog bootstrap failed',error);
+    setCatalogStatus('Локальный каталог не загрузился: '+(error&&error.message||error));
+   }
+   if(!navigator.onLine){loading=null;setCatalogStatus('Офлайн · показан сохранённый каталог');return window.MENU;}
+   try{
+    setCatalogStatus('Загружаем рецепты из базы…');
     let remote=await fetchRemoteCatalog();
     if(!Object.keys(remote.products).length||!remote.recipes.length){
      await seedRemoteFromMenu();
      remote=await fetchRemoteCatalog();
     }
     publish(remote);
+    setCatalogStatus('Каталог синхронизирован · '+remote.recipes.length+' рецептов');
    }catch(error){
     console.warn('Catalog sync failed, using local/seed',error);
-    if(!window.MENU)publish(seedMenu());
+    setCatalogStatus('База недоступна · показан локальный каталог. Лайки временно не сохранятся. '+(error&&error.message||error));
+    if(!window.MENU||!window.MENU.recipes||!window.MENU.recipes.length){
+     try{publish(seedMenu());}catch(e){}
+    }
    }finally{loading=null;}
    return window.MENU;
   })();
@@ -204,8 +241,8 @@
  }
 
  async function upsertProduct(product){
-  const id=product.id||('p-'+slugify(product.name)+'-'+crypto.randomUUID().slice(0,8));
-  const row={id,name:product.name.trim(),unit:product.unit,group_key:product.group,category:product.category||'other',note:product.note||'',kcal_per_100:product.kcal_per_100??null};
+  const id=product.id||('p-'+slugify(product.name)+'-'+uuid().slice(0,8));
+  const row={id,name:product.name.trim(),unit:product.unit,group_key:product.group,category:product.category||'other',note:product.note||'',kcal_per_100:product.kcal_per_100==null?null:product.kcal_per_100};
   await request('/products?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([row])});
   window.MENU.products[id]=toClientProduct(row);
   writeCache(currentCatalog());
@@ -214,7 +251,7 @@
  }
 
  async function saveRecipe(recipe){
-  const id=recipe.id||('c-'+crypto.randomUUID().slice(0,10));
+  const id=recipe.id||('c-'+uuid().slice(0,10));
   const row={
    id,title:recipe.title.trim(),meal:recipe.meal,mins:recipe.mins||'',
    servings:Number(recipe.servings)||2,per_occurrence:!!recipe.perOccurrence,
@@ -229,7 +266,7 @@
    if(!rowIng||!rowIng[0]||!(Number(rowIng[1])>0))continue;
    merged.set(rowIng[0],(merged.get(rowIng[0])||0)+Number(rowIng[1]));
   }
-  const ingredients=[...merged.entries()];
+  const ingredients=Array.from(merged.entries());
   if(ingredients.length){
    await request('/recipe_ingredients',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(ingredients.map(([product_id,quantity],sort_order)=>({recipe_id:id,product_id,quantity:Number(quantity),sort_order,note:''})))});
   }
@@ -272,7 +309,7 @@
 
  window.catalogApi={
   load,isReady:()=>ready,deviceId:ensureDeviceId,toggleLike,saveRecipe,deleteRecipe,upsertProduct,
-  refresh:async()=>{const remote=await fetchRemoteCatalog();publish(remote);return remote;}
+  refresh:async()=>{const remote=await fetchRemoteCatalog();publish(remote);setCatalogStatus('Каталог обновлён · '+remote.recipes.length+' рецептов');return remote;}
  };
  void load();
 })();

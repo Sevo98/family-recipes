@@ -103,6 +103,7 @@
 <p>Все количества — на двоих: завтрак на одно утро, салат на один день, обед и ужин на весь указанный блок. В карточках учтены гарниры, соусы и овощи. Мясо указано без костей, крупы — сухие, овощи — в подготовленном виде, консервы — без жидкости. Для покупки овощей обычно удобно округлять вес немного вверх. Числа в пошаговом описании относятся к обычным порциям; при увеличении порций ориентируйтесь на обновлённый список ингредиентов и пропорционально увеличивайте воду.</p>
 <div class="note"><b>Точные варианты для списка:</b> на завтраки с выбором «авокадо или хумус» взят хумус; для рыбы можно выбрать лосось или форель, дорадо или сибас в указанном весе филе. Альтернативы не складываются. Вода и соль по вкусу не входят в граммовки, базовые специи вынесены в проверку запасов. Перекусы по умолчанию выключены. Отдельного дополнительного завтрака при заготовке не возникает: если замораживаете партию, используйте её вместо будущей порции, а не сверх плана.</div>
 <div class="controls"><label>Размер порций<select id="portion-scale"><option value="1">Обычный · 2 человека</option><option value="1.25">На 25% больше · 2 человека</option><option value="1.5">На 50% больше · 2 человека</option></select></label><label>Найти рецепт<input type="search" id="recipe-search" placeholder="Например: котлеты или завтрак"></label><label>Приём пищи<select id="recipe-meal"><option value="all">Все</option><option>Завтрак</option><option>Обед</option><option>Ужин</option></select></label><label>День меню<select id="recipe-day"><option value="all">Все дни</option></select></label><label>Сортировка<select id="recipe-sort"><option value="menu">По меню</option><option value="likes">По лайкам</option><option value="title">По названию</option></select></label><label>Показать<select id="recipe-liked"><option value="all">Все рецепты</option><option value="liked">Понравившиеся · общие</option></select></label></div>
+<p class="status" id="catalog-status" aria-live="polite"></p>
 <p class="status" id="recipe-status" aria-live="polite"></p><div class="tools"><button type="button" id="recipe-add">Добавить рецепт</button><button id="expand-recipes">Раскрыть найденные рецепты</button><button id="collapse-recipes">Свернуть рецепты</button></div>
 <div id="recipe-editor" class="hidden no-print" aria-live="polite"></div>
 <div id="recipe-list"></div>
@@ -134,11 +135,13 @@
 <div class="tools no-print" style="margin-top:18px"><button id="download-list">Скачать текущий список .txt</button><button id="download-all">Скачать все закупки .txt</button><button id="print-list">Распечатать текущий список</button><button id="reset-list">Снять отметки в текущем списке</button></div>
 <p class="status">Галочки сохраняются в этом браузере, если доступно локальное хранилище. Это не учёт остатков: отметка означает «эта закупка закрыта». При увеличении порций или добавлении перекусов увеличившиеся позиции снова становятся неотмеченными. Для синхронизации между устройствами войдите в аккаунт в разделе сохранений.</p>
 </section>
-<script src="./menu-data.js"></script>
-<script src="./catalog.js"></script>
+<script src="./menu-data.js?v=android-compat-1"></script>
+<script src="./catalog.js?v=android-compat-1"></script>
 <script>
+function cloneData(value){try{if(typeof structuredClone==='function')return structuredClone(value);}catch{}return JSON.parse(JSON.stringify(value));}
+function makeId(){try{if(crypto&&typeof crypto.randomUUID==='function')return crypto.randomUUID();}catch{}return 'id-'+Math.random().toString(16).slice(2)+Date.now().toString(16);}
 if(!window.MENU||!Array.isArray(window.MENU.recipes)||!window.MENU.recipes.length){
- if(window.MENU_SEED)window.MENU={products:structuredClone(MENU_SEED.products),recipes:MENU_SEED.recipes.map(r=>({...structuredClone(r),likesCount:0,liked:false,description:r.description||'',isCustom:false})),saladMeals:structuredClone(MENU_SEED.saladMeals),saladPlan:structuredClone(MENU_SEED.saladPlan)};
+ if(window.MENU_SEED)window.MENU={products:cloneData(MENU_SEED.products),recipes:MENU_SEED.recipes.map(r=>({...cloneData(r),likesCount:0,liked:false,description:r.description||'',isCustom:false})),saladMeals:cloneData(MENU_SEED.saladMeals),saladPlan:cloneData(MENU_SEED.saladPlan)};
  else window.MENU={products:{},recipes:[],saladMeals:{},saladPlan:{}};
 }
 let MENU=window.MENU;
@@ -392,7 +395,7 @@ for(let i=1;i<=30;i++){for(const id of ['recipe-day','shop-day','salad-day','tod
 $('portion-scale').value=String(state.scale);$('include-snacks').checked=state.snacks;$('hide-done').checked=state.hideDone;$('shop-week').value=state.week;$('shop-day').value=state.day;$('daily-week').checked=state.dailyWeek;$('today-day').value=String(state.todayDay);
 $('today-day').addEventListener('change',e=>{state.todayDay=Number(e.target.value);save();renderToday();});
 $('today-reset').addEventListener('click',()=>{state.todayDay=planDayFromDate();save();renderToday();});
-$('custom-ingredient-form').addEventListener('submit',e=>{e.preventDefault();const name=$('custom-ingredient-name').value.trim(),qty=Number($('custom-ingredient-quantity').value),unit=$('custom-ingredient-unit').value,category=PRODUCT_CATEGORIES[$('custom-ingredient-category').value]?$('custom-ingredient-category').value:'other';if(!name||!Number.isFinite(qty)||qty<=0)return;const group=state.period==='month'?'month':state.period==='week'?'week':'day';state.customIngredients.push({id:'custom-'+crypto.randomUUID(),name,qty,unit,category,group,week:state.week,day:state.day});$('custom-ingredient-name').value='';$('custom-ingredient-quantity').value='1';$('custom-ingredient-status').textContent='Добавлено в текущий список. Позиция сохранится и синхронизируется.';save();renderShop();});
+$('custom-ingredient-form').addEventListener('submit',e=>{e.preventDefault();const name=$('custom-ingredient-name').value.trim(),qty=Number($('custom-ingredient-quantity').value),unit=$('custom-ingredient-unit').value,category=PRODUCT_CATEGORIES[$('custom-ingredient-category').value]?$('custom-ingredient-category').value:'other';if(!name||!Number.isFinite(qty)||qty<=0)return;const group=state.period==='month'?'month':state.period==='week'?'week':'day';state.customIngredients.push({id:'custom-'+makeId(),name,qty,unit,category,group,week:state.week,day:state.day});$('custom-ingredient-name').value='';$('custom-ingredient-quantity').value='1';$('custom-ingredient-status').textContent='Добавлено в текущий список. Позиция сохранится и синхронизируется.';save();renderShop();});
 for(const id of ['recipe-search','recipe-meal','recipe-day','recipe-sort'])if($(id))$(id).addEventListener(id==='recipe-search'?'input':'change',renderRecipes);
 if($('recipe-liked'))$('recipe-liked').addEventListener('change',()=>{
  renderRecipes();
@@ -502,5 +505,5 @@ save=function(){localSave();window.dispatchEvent(new Event('recipe-change'));};
  document.addEventListener('click',e=>{if(!panel.hidden&&!e.target.closest('#jump-nav'))close();});
 })();
 </script>
-<script src="./supabase-2.117.2.js"></script><script src="./cloud.js?v=catalog-20261012"></script><script src="./pwa.js"></script></body></html>
+<script src="./supabase-2.117.2.js"></script><script src="./cloud.js?v=android-compat-1"></script><script src="./pwa.js?v=android-compat-1"></script></body></html>
 
