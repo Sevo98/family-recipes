@@ -9,6 +9,7 @@
 <aside class="note no-print" id="app-install"><b>Меню на телефоне</b><p id="install-help">Android: меню браузера → «Установить приложение». iPhone: откройте в Safari → «Поделиться» → «На экран Домой». После первого открытия онлайн меню доступно без интернета.</p><button id="install-app" hidden>Установить приложение</button><p id="offline-status" role="status"></p></aside><nav><a href="#today">Рецепты дня</a><a href="#base">Порции и ГВ</a><a href="#menu">Обеды и ужины</a><a href="#breakfast">30 завтраков</a><a href="#recipes">Все рецепты</a><a href="#salads">Салаты</a><a href="#shop">Список покупок</a><a href="#storage">Хранение</a></nav><button onclick="window.print()">Распечатать / сохранить в PDF</button>
 <section id="today-section" class="note">
 <h2 id="today" style="margin-top:0;border:0;padding:0">Рецепты дня</h2>
+<div class="controls" style="margin:10px 0 0"><label>День меню<select id="today-day"></select></label><button type="button" id="today-reset">Сегодня</button></div>
 <p id="today-meta" class="meta"></p>
 <div id="today-list" class="today-list"></div>
 </section>
@@ -138,7 +139,7 @@ const PRODUCT_CATEGORIES={grains:"Крупы и гарниры",legumes:"Боб�
 const CATEGORY_ORDER=["grains", "legumes", "nuts", "oils", "frozen", "meat", "fish", "dairy", "veggies", "fruits", "greens", "bread", "other"];
 const $=id=>document.getElementById(id);
 const STORE='meal-plan-30-v3';
-let state={period:'month',week:1,day:1,dailyWeek:false,scale:1,snacks:false,hideDone:false,categoryFilter:'all',checked:{},saladDay:1,saladOverrides:{},customIngredients:[]};
+let state={period:'month',week:1,day:1,todayDay:null,dailyWeek:false,scale:1,snacks:false,hideDone:false,categoryFilter:'all',checked:{},saladDay:1,saladOverrides:{},customIngredients:[]};
 let storageOK=true;
 try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');if(saved){state={...state,...saved};state.checked=saved.checked||{};}}catch(e){storageOK=false;}
 if(!['month','week','day'].includes(state.period))state.period='month';
@@ -148,8 +149,10 @@ state.saladOverrides=state.saladOverrides&&typeof state.saladOverrides==='object
 state.customIngredients=Array.isArray(state.customIngredients)?state.customIngredients.filter(x=>x&&typeof x.id==='string'&&typeof x.name==='string'&&Number.isFinite(Number(x.qty))&&Number(x.qty)>0&&['month','week','day'].includes(x.group)).map(x=>({...x,category:PRODUCT_CATEGORIES[x.category]?x.category:'other'})):[];
 state.saladDay=Math.max(1,Math.min(30,Number(state.saladDay)||1));
 if(state.categoryFilter!=='all'&&!PRODUCT_CATEGORIES[state.categoryFilter])state.categoryFilter='all';
-function selectedSalad(day){const wanted=state.saladOverrides[day];return MENU.recipes.some(r=>r.meal==='Салат'&&r.id===wanted)?wanted:MENU.saladPlan[day];}
 function planDayFromDate(date=new Date()){const d=date.getDate();return d>30?30:d;}
+if(state.todayDay==null||state.todayDay==='')state.todayDay=planDayFromDate();
+state.todayDay=Math.max(1,Math.min(30,Number(state.todayDay)||planDayFromDate()));
+function selectedSalad(day){const wanted=state.saladOverrides[day];return MENU.recipes.some(r=>r.meal==='Салат'&&r.id===wanted)?wanted:MENU.saladPlan[day];}
 function cookHint(r,day){
  if(r.meal==='Салат')return {cook:true,text:'Собрать и заправить перед едой.'};
  if(r.meal==='Перекус')return {cook:true,text:'Собрать по голоду.'};
@@ -173,10 +176,11 @@ function recipesForPlanDay(day){
  return items;
 }
 function renderToday(){
- const now=new Date(),calendarDay=now.getDate(),day=planDayFromDate(now);
+ const now=new Date(),calendarDay=planDayFromDate(now),day=state.todayDay;
+ if($('today-day'))$('today-day').value=String(day);
  const dateLabel=now.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
- let meta='Сегодня '+dateLabel+' · день меню '+day;
- if(calendarDay>30)meta+='. В плане 30 дней: для 31-го числа показан день 30.';
+ let meta=day===calendarDay?'Сегодня '+dateLabel+' · день меню '+day:'Выбран день меню '+day+' · сегодня '+dateLabel+' (день '+calendarDay+')';
+ if(now.getDate()>30&&day===30)meta+='. В плане 30 дней: для 31-го числа удобен день 30.';
  meta+=' Обед и ужин готовьте в первый день блока; в остальные дни разогревайте порцию.';
  $('today-meta').textContent=meta;
  const items=recipesForPlanDay(day);
@@ -271,8 +275,10 @@ function renderShop(){
 }
 function textRows(rows,d){return rows.map(r=>(isChecked(r,d)?'[x] ':'[ ] ')+r.name+' — '+(r.id==='pantry'?'проверить запас':fmt(r.qty,r.unit))+(r.note?' ('+r.note+')':'')).join('\n');}
 function download(text,name){const blob=new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-for(let i=1;i<=30;i++){for(const id of ['recipe-day','shop-day','salad-day']){const o=document.createElement('option');o.value=i;o.textContent='День '+i;$(id).appendChild(o);}}
-$('portion-scale').value=String(state.scale);$('include-snacks').checked=state.snacks;$('hide-done').checked=state.hideDone;$('shop-week').value=state.week;$('shop-day').value=state.day;$('daily-week').checked=state.dailyWeek;
+for(let i=1;i<=30;i++){for(const id of ['recipe-day','shop-day','salad-day','today-day']){const o=document.createElement('option');o.value=i;o.textContent='День '+i;$(id).appendChild(o);}}
+$('portion-scale').value=String(state.scale);$('include-snacks').checked=state.snacks;$('hide-done').checked=state.hideDone;$('shop-week').value=state.week;$('shop-day').value=state.day;$('daily-week').checked=state.dailyWeek;$('today-day').value=String(state.todayDay);
+$('today-day').addEventListener('change',e=>{state.todayDay=Number(e.target.value);save();renderToday();});
+$('today-reset').addEventListener('click',()=>{state.todayDay=planDayFromDate();save();renderToday();});
 $('custom-ingredient-form').addEventListener('submit',e=>{e.preventDefault();const name=$('custom-ingredient-name').value.trim(),qty=Number($('custom-ingredient-quantity').value),unit=$('custom-ingredient-unit').value,category=PRODUCT_CATEGORIES[$('custom-ingredient-category').value]?$('custom-ingredient-category').value:'other';if(!name||!Number.isFinite(qty)||qty<=0)return;const group=state.period==='month'?'month':state.period==='week'?'week':'day';state.customIngredients.push({id:'custom-'+crypto.randomUUID(),name,qty,unit,category,group,week:state.week,day:state.day});$('custom-ingredient-name').value='';$('custom-ingredient-quantity').value='1';$('custom-ingredient-status').textContent='Добавлено в текущий список. Позиция сохранится и синхронизируется.';save();renderShop();});
 for(const id of ['recipe-search','recipe-meal','recipe-day'])$(id).addEventListener(id==='recipe-search'?'input':'change',renderRecipes);
 $('portion-scale').addEventListener('change',e=>{state.scale=Number(e.target.value);save();renderRecipes();renderSalads();renderShop();});
