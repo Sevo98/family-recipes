@@ -6,7 +6,12 @@
 <p class="meta">30 дней · 2 взрослых · без печени · готовка на 2–3 дня</p>
 <h1><img src="./fridge-food-icon.svg" alt="" width="58" height="58" style="vertical-align:middle;margin-right:12px;border-radius:16px;box-shadow:0 4px 14px #314b3533">Разнообразное меню, которое удобно готовить заранее</h1>
 <p class="lead">Общие блюда для пары, которая начала тренироваться. Каждый день — полноценный завтрак, обед, ужин и перекусы по голоду. С учётом грудного вскармливания, без намеренного ограничения калорий.</p>
-<aside class="note no-print" id="app-install"><b>Меню на телефоне</b><p id="install-help">Android: меню браузера → «Установить приложение». iPhone: откройте в Safari → «Поделиться» → «На экран Домой». После первого открытия онлайн меню доступно без интернета.</p><button id="install-app" hidden>Установить приложение</button><p id="offline-status" role="status"></p></aside><nav><a href="#base">Порции и ГВ</a><a href="#menu">Обеды и ужины</a><a href="#breakfast">30 завтраков</a><a href="#recipes">Все рецепты</a><a href="#salads">Салаты</a><a href="#shop">Список покупок</a><a href="#storage">Хранение</a></nav><button onclick="window.print()">Распечатать / сохранить в PDF</button>
+<aside class="note no-print" id="app-install"><b>Меню на телефоне</b><p id="install-help">Android: меню браузера → «Установить приложение». iPhone: откройте в Safari → «Поделиться» → «На экран Домой». После первого открытия онлайн меню доступно без интернета.</p><button id="install-app" hidden>Установить приложение</button><p id="offline-status" role="status"></p></aside><nav><a href="#today">Рецепты дня</a><a href="#base">Порции и ГВ</a><a href="#menu">Обеды и ужины</a><a href="#breakfast">30 завтраков</a><a href="#recipes">Все рецепты</a><a href="#salads">Салаты</a><a href="#shop">Список покупок</a><a href="#storage">Хранение</a></nav><button onclick="window.print()">Распечатать / сохранить в PDF</button>
+<section id="today-section" class="note">
+<h2 id="today" style="margin-top:0;border:0;padding:0">Рецепты дня</h2>
+<p id="today-meta" class="meta"></p>
+<div id="today-list" class="today-list"></div>
+</section>
 <div class="note"><b>Как пользоваться.</b> Дни условные: начинайте с любого дня недели. В начале каждого блока готовьте обед и ужин на указанные 2–3 дня. Завтраки чередуются, но используют одни заготовки. План рассчитан на наличие плиты, духовки, холодильника и небольшой морозилки. Учтены предпочтения: без печени, болгарского перца, кинзы, брокколи, цветной капусты и петрушки; минтай также исключён. Из субпродуктов исключена только печень. Сердечки и желудочки включены в меню. Молочные продукты, яйца и бобовые включены; сведения об аллергиях не предоставлены.</div>
 
 <h2 id="base">Порции, клетчатка и грудное вскармливание</h2>
@@ -80,7 +85,7 @@
 </tbody></table></div>
 
 <style>
-.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:16px 0}.controls label{display:flex;flex-direction:column;gap:4px;font-size:14px}.controls select,.controls input[type=search]{font:inherit;border:1px solid #89978a;background:white;border-radius:5px;padding:9px;max-width:100%}.controls label.inline{display:flex;flex-direction:row;align-items:center;gap:8px}.tools{display:flex;gap:8px;flex-wrap:wrap}.tab[aria-pressed=true]{background:#263f31;color:white}.recipe-detail{border-top:1px solid #c9d1c7;padding:14px 0}.recipe-detail summary{cursor:pointer;font-size:18px;font-weight:650}.recipe-detail summary small{font-size:13px;font-weight:400;display:block;color:#526557}.recipe-body{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:30px;padding:10px 0}.ingredients{padding-left:20px}.steps{padding-left:24px}.steps li{margin-bottom:12px}.pill{font-size:13px;display:inline-block;margin-right:10px;color:#526557}.shop-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.shop-row.done{opacity:.58}.shop-row.done .product-name{text-decoration:line-through}.product-category{color:#526557;display:block;font-weight:400;margin-top:2px}input[type=checkbox]{width:19px;height:19px;accent-color:#365b3d;vertical-align:middle;cursor:pointer}.shop-check{display:flex;gap:10px;align-items:start}.shop-check input{flex:none;margin-top:4px}.shop-row td:first-child{font-weight:400;min-width:220px}.shop-row details{font-size:13px}.shop-row details summary{cursor:pointer}.status{font-size:14px;color:#526557;min-height:1.6em}#shopping-list td:nth-child(2){white-space:nowrap;font-weight:650}#shopping-list small{display:block;font-weight:400}.no-print{display:block}.recipe-links{font-size:13px}.recipe-links a{margin-right:10px}.print-list-title{display:none}.hidden{display:none!important}@media(max-width:700px){.recipe-body{grid-template-columns:1fr;gap:4px}.shop-heading{align-items:start;flex-direction:column}.controls{gap:10px}.recipe-detail summary{font-size:16px}}@media print{.controls,.tools,.no-print,.status{display:none!important}.recipe-body{grid-template-columns:1fr 2fr;gap:15px}.recipe-detail{break-inside:auto}.recipe-detail summary{font-size:14px}.recipe-detail li{font-size:11px}body.print-shopping main>*{display:none!important}body.print-shopping main>#shop-section{display:block!important}body.print-shopping .print-list-title{display:block}.shop-row.done{display:none}#shopping-list details{display:none}.scroll{overflow:visible}.recipe-links{display:none}}
+.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:16px 0}.controls label{display:flex;flex-direction:column;gap:4px;font-size:14px}.controls select,.controls input[type=search]{font:inherit;border:1px solid #89978a;background:white;border-radius:5px;padding:9px;max-width:100%}.controls label.inline{display:flex;flex-direction:row;align-items:center;gap:8px}.tools{display:flex;gap:8px;flex-wrap:wrap}.tab[aria-pressed=true]{background:#263f31;color:white}.recipe-detail{border-top:1px solid #c9d1c7;padding:14px 0}.recipe-detail summary{cursor:pointer;font-size:18px;font-weight:650}.recipe-detail summary small{font-size:13px;font-weight:400;display:block;color:#526557}.recipe-body{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:30px;padding:10px 0}.ingredients{padding-left:20px}.steps{padding-left:24px}.steps li{margin-bottom:12px}.pill{font-size:13px;display:inline-block;margin-right:10px;color:#526557}.shop-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.shop-row.done{opacity:.58}.shop-row.done .product-name{text-decoration:line-through}.product-category{color:#526557;display:block;font-weight:400;margin-top:2px}.today-list{display:grid;gap:10px;margin-top:12px}.today-card{background:#fff;border:1px solid #c9d1c7;border-radius:8px;padding:12px 14px}.today-card .today-meal{font-size:13px;font-weight:650;color:#526557;text-transform:uppercase;letter-spacing:.02em}.today-card .today-title{font-size:17px;font-weight:650;margin:4px 0 6px}.today-card .today-hint{font-size:14px;color:#526557;margin:0}.today-card .today-actions{margin-top:8px}.today-card.cook{border-color:#365b3d;box-shadow:inset 3px 0 0 #365b3d}.today-card.reheat{opacity:.92}input[type=checkbox]{width:19px;height:19px;accent-color:#365b3d;vertical-align:middle;cursor:pointer}.shop-check{display:flex;gap:10px;align-items:start}.shop-check input{flex:none;margin-top:4px}.shop-row td:first-child{font-weight:400;min-width:220px}.shop-row details{font-size:13px}.shop-row details summary{cursor:pointer}.status{font-size:14px;color:#526557;min-height:1.6em}#shopping-list td:nth-child(2){white-space:nowrap;font-weight:650}#shopping-list small{display:block;font-weight:400}.no-print{display:block}.recipe-links{font-size:13px}.recipe-links a{margin-right:10px}.print-list-title{display:none}.hidden{display:none!important}@media(max-width:700px){.recipe-body{grid-template-columns:1fr;gap:4px}.shop-heading{align-items:start;flex-direction:column}.controls{gap:10px}.recipe-detail summary{font-size:16px}}@media print{.controls,.tools,.no-print,.status{display:none!important}.recipe-body{grid-template-columns:1fr 2fr;gap:15px}.recipe-detail{break-inside:auto}.recipe-detail summary{font-size:14px}.recipe-detail li{font-size:11px}body.print-shopping main>*{display:none!important}body.print-shopping main>#shop-section{display:block!important}body.print-shopping .print-list-title{display:block}.shop-row.done{display:none}#shopping-list details{display:none}.scroll{overflow:visible}.recipe-links{display:none}}
 </style>
 <section class="note no-print" id="cloud-panel">
 <h2 style="margin-top:0">Сохранения между устройствами</h2>
@@ -144,6 +149,44 @@ state.customIngredients=Array.isArray(state.customIngredients)?state.customIngre
 state.saladDay=Math.max(1,Math.min(30,Number(state.saladDay)||1));
 if(state.categoryFilter!=='all'&&!PRODUCT_CATEGORIES[state.categoryFilter])state.categoryFilter='all';
 function selectedSalad(day){const wanted=state.saladOverrides[day];return MENU.recipes.some(r=>r.meal==='Салат'&&r.id===wanted)?wanted:MENU.saladPlan[day];}
+function planDayFromDate(date=new Date()){const d=date.getDate();return d>30?30:d;}
+function cookHint(r,day){
+ if(r.meal==='Салат')return {cook:true,text:'Собрать и заправить перед едой.'};
+ if(r.meal==='Перекус')return {cook:true,text:'Собрать по голоду.'};
+ if(r.meal==='Завтрак')return {cook:true,text:r.mins.includes('вечером')?'Основа с вечера · доделать утром.':'Готовить утром или из заготовки.'};
+ const first=Math.min(...r.days),last=Math.max(...r.days);
+ if(day===first)return {cook:true,text:r.days.length>1?'Готовить партию сегодня на дни '+first+'–'+last+'.':'Готовить сегодня.'};
+ return {cook:false,text:'Разогреть порцию из партии с дня '+first+' (дни '+first+'–'+last+').'};
+}
+function recipesForPlanDay(day){
+ const items=[];
+ const pushSalad=()=>{const salad=MENU.recipes.find(r=>r.id===selectedSalad(day));if(salad)items.push({...salad,mealLabel:'Салат к '+(MENU.saladMeals[day]==='Обед'?'обеду':'ужину')});};
+ const breakfast=MENU.recipes.find(r=>r.meal==='Завтрак'&&r.days.includes(day));
+ if(breakfast)items.push(breakfast);
+ const lunch=MENU.recipes.find(r=>r.meal==='Обед'&&r.days.includes(day));
+ if(lunch)items.push(lunch);
+ if(MENU.saladMeals[day]==='Обед')pushSalad();
+ const dinner=MENU.recipes.find(r=>r.meal==='Ужин'&&r.days.includes(day));
+ if(dinner)items.push(dinner);
+ if(MENU.saladMeals[day]==='Ужин')pushSalad();
+ if(state.snacks){const snack=MENU.recipes.find(r=>r.id==='snack');if(snack)items.push(snack);}
+ return items;
+}
+function renderToday(){
+ const now=new Date(),calendarDay=now.getDate(),day=planDayFromDate(now);
+ const dateLabel=now.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+ let meta='Сегодня '+dateLabel+' · день меню '+day;
+ if(calendarDay>30)meta+='. В плане 30 дней: для 31-го числа показан день 30.';
+ meta+=' Обед и ужин готовьте в первый день блока; в остальные дни разогревайте порцию.';
+ $('today-meta').textContent=meta;
+ const items=recipesForPlanDay(day);
+ $('today-list').innerHTML=items.map(r=>{
+  const hint=cookHint(r,day);
+  const meal=r.mealLabel||r.meal;
+  return `<article class="today-card ${hint.cook?'cook':'reheat'}"><div class="today-meal">${esc(meal)}</div><div class="today-title">${esc(r.title)}</div><p class="today-hint">${esc(hint.text)} · ${esc(r.mins)}</p><div class="today-actions"><a href="#recipe-${r.id}" data-today-open="${r.id}">Открыть рецепт</a></div></article>`;
+ }).join('')||'<p class="meta">На этот день рецептов нет.</p>';
+ $('today-list').querySelectorAll('[data-today-open]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRecipe(a.dataset.todayOpen);}));
+}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1});
 function fmt(q,unit){if(unit==='г'&&q>=1000)return nf.format(q/1000)+' кг';if(unit==='мл'&&q>=1000)return nf.format(q/1000)+' л';return nf.format(q)+' '+unit;}
@@ -233,7 +276,7 @@ $('portion-scale').value=String(state.scale);$('include-snacks').checked=state.s
 $('custom-ingredient-form').addEventListener('submit',e=>{e.preventDefault();const name=$('custom-ingredient-name').value.trim(),qty=Number($('custom-ingredient-quantity').value),unit=$('custom-ingredient-unit').value,category=PRODUCT_CATEGORIES[$('custom-ingredient-category').value]?$('custom-ingredient-category').value:'other';if(!name||!Number.isFinite(qty)||qty<=0)return;const group=state.period==='month'?'month':state.period==='week'?'week':'day';state.customIngredients.push({id:'custom-'+crypto.randomUUID(),name,qty,unit,category,group,week:state.week,day:state.day});$('custom-ingredient-name').value='';$('custom-ingredient-quantity').value='1';$('custom-ingredient-status').textContent='Добавлено в текущий список. Позиция сохранится и синхронизируется.';save();renderShop();});
 for(const id of ['recipe-search','recipe-meal','recipe-day'])$(id).addEventListener(id==='recipe-search'?'input':'change',renderRecipes);
 $('portion-scale').addEventListener('change',e=>{state.scale=Number(e.target.value);save();renderRecipes();renderSalads();renderShop();});
-for(const [id,key] of [['include-snacks','snacks'],['hide-done','hideDone'],['daily-week','dailyWeek']])$(id).addEventListener('change',e=>{state[key]=e.target.checked;save();renderShop();});
+for(const [id,key] of [['include-snacks','snacks'],['hide-done','hideDone'],['daily-week','dailyWeek']])$(id).addEventListener('change',e=>{state[key]=e.target.checked;save();renderShop();if(key==='snacks')renderToday();});
 $('shop-category').addEventListener('change',e=>{state.categoryFilter=e.target.value;save();renderShop();});
 for(const [id,key] of [['shop-week','week'],['shop-day','day']])$(id).addEventListener('change',e=>{state[key]=Number(e.target.value);save();renderShop();});
 document.querySelectorAll('[data-period]').forEach(b=>b.addEventListener('click',()=>{state.period=b.dataset.period;save();renderShop();}));
@@ -254,12 +297,12 @@ const printOpen=[];
 window.addEventListener('beforeprint',()=>{if(!document.body.classList.contains('print-shopping'))document.querySelectorAll('.recipe-detail').forEach(e=>{printOpen.push([e,e.open]);e.open=true;});});
 window.addEventListener('afterprint',()=>{for(const [e,open]of printOpen)e.open=open;printOpen.length=0;});
 $('salad-day').addEventListener('change',e=>{state.saladDay=Number(e.target.value);save();renderSalads();});
-$('salad-choice').addEventListener('change',e=>{state.saladOverrides[state.saladDay]=e.target.value;save();renderSalads();renderShop();renderMainLinks();});
+$('salad-choice').addEventListener('change',e=>{state.saladOverrides[state.saladDay]=e.target.value;save();renderSalads();renderShop();renderMainLinks();renderToday();});
 $('salad-kind').addEventListener('change',renderSalads);$('salad-search').addEventListener('input',renderSalads);
 $('expand-salads').onclick=()=>document.querySelectorAll('#salad-list .recipe-detail').forEach(e=>e.open=true);
 $('collapse-salads').onclick=()=>document.querySelectorAll('#salad-list .recipe-detail').forEach(e=>e.open=false);
 document.querySelectorAll('[data-salad-main]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRecipe(a.dataset.saladMain);}));
-renderRecipes();renderSalads();renderShop();save();
+renderRecipes();renderSalads();renderShop();renderToday();save();
 // К каждому приёму пищи в исходном меню добавляем переход к рецепту.
 const mainTable=document.querySelector('#menu + p + .scroll table');
 function renderMainLinks(){if(mainTable){for(const tr of mainTable.tBodies[0].rows){const start=Number(tr.cells[0].textContent.split('–')[0]),end=Number(tr.cells[0].textContent.split('–')[1]||start);for(const [col,meal]of [[1,'Обед'],[2,'Ужин']]){tr.cells[col].querySelectorAll('.recipe-links').forEach(el=>el.remove());const refs=activeRecipes().filter(r=>(r.meal===meal||r.meal==='Салат')&&r.days.some(d=>d>=start&&d<=end&&(r.meal!=='Салат'||MENU.saladMeals[d]===meal)));const line=document.createElement('div');line.className='recipe-links';for(const r of refs){const a=document.createElement('a');a.href='#recipe-'+r.id;a.textContent=r.meal==='Салат'?r.title+' · дни '+r.days.filter(d=>d>=start&&d<=end).join(', '):refs.filter(x=>x.meal!=='Салат').length>1?'Рецепт · день '+r.days.filter(d=>d>=start&&d<=end).join(', '):'Пошаговый рецепт';a.onclick=e=>{e.preventDefault();openRecipe(r.id)};line.appendChild(a);}tr.cells[col].appendChild(line);}}}
@@ -276,7 +319,7 @@ window.recipeBridge={
    if(/^salad:([1-9]|[12][0-9]|30)$/.test(key)&&MENU.recipes.some(r=>r.meal==='Салат'&&r.id===value))state.saladOverrides[key.slice(6)]=value;
   }
   $('portion-scale').value=String(state.scale);$('include-snacks').checked=state.snacks;
-  localSave();renderRecipes();renderSalads();renderShop();renderMainLinks();
+  localSave();renderRecipes();renderSalads();renderShop();renderMainLinks();renderToday();
  }
 };
 const localSave=save;
