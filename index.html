@@ -85,7 +85,7 @@
 </tbody></table></div>
 
 <style>
-.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:16px 0}.controls label{display:flex;flex-direction:column;gap:4px;font-size:14px}.controls select,.controls input[type=search]{font:inherit;border:1px solid #89978a;background:white;border-radius:5px;padding:9px;max-width:100%}.controls label.inline{display:flex;flex-direction:row;align-items:center;gap:8px}.tools{display:flex;gap:8px;flex-wrap:wrap}.tab[aria-pressed=true]{background:#263f31;color:white}.recipe-detail{border-top:1px solid #c9d1c7;padding:14px 0}.recipe-detail summary{cursor:pointer;font-size:18px;font-weight:650}.recipe-detail summary small{font-size:13px;font-weight:400;display:block;color:#526557}.recipe-body{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:30px;padding:10px 0}.ingredients{padding-left:20px}.steps{padding-left:24px}.steps li{margin-bottom:12px}.pill{font-size:13px;display:inline-block;margin-right:10px;color:#526557}.shop-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.shop-row.done{opacity:.58}.shop-row.done .product-name{text-decoration:line-through}.product-category{color:#526557;display:block;font-weight:400;margin-top:2px}.today-list{display:grid;gap:10px;margin-top:12px}.today-card{background:#fff;border:1px solid #c9d1c7;border-radius:8px;padding:12px 14px}.today-card .today-meal{font-size:13px;font-weight:650;color:#526557;text-transform:uppercase;letter-spacing:.02em}.today-card .today-title{font-size:17px;font-weight:650;margin:4px 0 6px}.today-card .today-hint{font-size:14px;color:#526557;margin:0}.today-card .today-actions{margin-top:8px}.today-card.cook{border-color:#365b3d;box-shadow:inset 3px 0 0 #365b3d}.today-card.reheat{opacity:.92}input[type=checkbox]{width:19px;height:19px;accent-color:#365b3d;vertical-align:middle;cursor:pointer}.shop-check{display:flex;gap:10px;align-items:start}.shop-check input{flex:none;margin-top:4px}.shop-row td:first-child{font-weight:400;min-width:220px}.shop-row details{font-size:13px}.shop-row details summary{cursor:pointer}.status{font-size:14px;color:#526557;min-height:1.6em}#shopping-list td:nth-child(2){white-space:nowrap;font-weight:650}#shopping-list small{display:block;font-weight:400}.no-print{display:block}.recipe-links{font-size:13px}.recipe-links a{margin-right:10px}.print-list-title{display:none}.hidden{display:none!important}@media(max-width:700px){.recipe-body{grid-template-columns:1fr;gap:4px}.shop-heading{align-items:start;flex-direction:column}.controls{gap:10px}.recipe-detail summary{font-size:16px}}@media print{.controls,.tools,.no-print,.status{display:none!important}.recipe-body{grid-template-columns:1fr 2fr;gap:15px}.recipe-detail{break-inside:auto}.recipe-detail summary{font-size:14px}.recipe-detail li{font-size:11px}body.print-shopping main>*{display:none!important}body.print-shopping main>#shop-section{display:block!important}body.print-shopping .print-list-title{display:block}.shop-row.done{display:none}#shopping-list details{display:none}.scroll{overflow:visible}.recipe-links{display:none}}
+.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:16px 0}.controls label{display:flex;flex-direction:column;gap:4px;font-size:14px}.controls select,.controls input[type=search]{font:inherit;border:1px solid #89978a;background:white;border-radius:5px;padding:9px;max-width:100%}.controls label.inline{display:flex;flex-direction:row;align-items:center;gap:8px}.tools{display:flex;gap:8px;flex-wrap:wrap}.tab[aria-pressed=true]{background:#263f31;color:white}.recipe-detail{border-top:1px solid #c9d1c7;padding:14px 0}.recipe-detail summary{cursor:pointer;font-size:18px;font-weight:650}.recipe-detail summary small{font-size:13px;font-weight:400;display:block;color:#526557}.recipe-body{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:30px;padding:10px 0}.ingredients{padding-left:20px}.steps{padding-left:24px}.steps li{margin-bottom:12px}.pill{font-size:13px;display:inline-block;margin-right:10px;color:#526557}.shop-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.shop-row.done{opacity:.58}.shop-row.done .product-name{text-decoration:line-through}.product-category{color:#526557;display:block;font-weight:400;margin-top:2px}.today-list{display:grid;gap:10px;margin-top:12px}.today-card{background:#fff;border:1px solid #c9d1c7;border-radius:8px;padding:12px 14px}.today-card .today-meal{font-size:13px;font-weight:650;color:#526557;text-transform:uppercase;letter-spacing:.02em}.today-card .today-title{font-size:17px;font-weight:650;margin:4px 0 6px}.today-card .today-hint{font-size:14px;color:#526557;margin:0}.today-card .today-actions{margin-top:8px}.today-card.cook{border-color:#365b3d;box-shadow:inset 3px 0 0 #365b3d}.today-card.reheat{opacity:.92}#jump-nav{position:fixed;right:14px;bottom:22px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px}#jump-nav-toggle{width:46px;height:46px;padding:0;border-radius:50%;border:1px solid #365b3d;background:#263f31;color:#fff;font-size:20px;line-height:1;box-shadow:0 4px 14px #314b3533}#jump-nav-toggle[aria-expanded=true]{background:#365b3d}#jump-nav-panel{width:min(260px,calc(100vw - 28px));background:#fff;border:1px solid #c9d1c7;border-radius:10px;padding:12px;box-shadow:0 10px 28px #26352e22}#jump-nav-panel[hidden]{display:none!important}.jump-nav-title{margin:0 0 8px;font-size:13px;font-weight:650;color:#526557}#jump-nav-panel nav{display:flex;flex-direction:column;gap:2px;margin:0}#jump-nav-panel a{display:block;padding:8px 10px;border-radius:6px;text-decoration:none;color:#26352e}#jump-nav-panel a:hover,#jump-nav-panel a:focus-visible{background:#e9eee4}#jump-nav-close{margin-top:8px;width:100%;font-size:14px;padding:8px 12px}@media print{#jump-nav{display:none!important}}input[type=checkbox]{width:19px;height:19px;accent-color:#365b3d;vertical-align:middle;cursor:pointer}.shop-check{display:flex;gap:10px;align-items:start}.shop-check input{flex:none;margin-top:4px}.shop-row td:first-child{font-weight:400;min-width:220px}.shop-row details{font-size:13px}.shop-row details summary{cursor:pointer}.status{font-size:14px;color:#526557;min-height:1.6em}#shopping-list td:nth-child(2){white-space:nowrap;font-weight:650}#shopping-list small{display:block;font-weight:400}.no-print{display:block}.recipe-links{font-size:13px}.recipe-links a{margin-right:10px}.print-list-title{display:none}.hidden{display:none!important}@media(max-width:700px){.recipe-body{grid-template-columns:1fr;gap:4px}.shop-heading{align-items:start;flex-direction:column}.controls{gap:10px}.recipe-detail summary{font-size:16px}}@media print{.controls,.tools,.no-print,.status{display:none!important}.recipe-body{grid-template-columns:1fr 2fr;gap:15px}.recipe-detail{break-inside:auto}.recipe-detail summary{font-size:14px}.recipe-detail li{font-size:11px}body.print-shopping main>*{display:none!important}body.print-shopping main>#shop-section{display:block!important}body.print-shopping .print-list-title{display:block}.shop-row.done{display:none}#shopping-list details{display:none}.scroll{overflow:visible}.recipe-links{display:none}}
 </style>
 <section class="note no-print" id="cloud-panel">
 <h2 style="margin-top:0">Сохранения между устройствами</h2>
@@ -302,6 +302,21 @@ $('salad-kind').addEventListener('change',renderSalads);$('salad-search').addEve
 $('expand-salads').onclick=()=>document.querySelectorAll('#salad-list .recipe-detail').forEach(e=>e.open=true);
 $('collapse-salads').onclick=()=>document.querySelectorAll('#salad-list .recipe-detail').forEach(e=>e.open=false);
 document.querySelectorAll('[data-salad-main]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRecipe(a.dataset.saladMain);}));
+(function setupJumpNav(){
+ const panel=$('jump-nav-panel'),toggle=$('jump-nav-toggle'),closeBtn=$('jump-nav-close');
+ if(!panel||!toggle)return;
+ function setOpen(open){
+  panel.hidden=!open;
+  toggle.setAttribute('aria-expanded',open?'true':'false');
+  toggle.setAttribute('aria-label',open?'Закрыть навигацию по разделам':'Открыть навигацию по разделам');
+ }
+ function close(){setOpen(false);}
+ toggle.addEventListener('click',()=>setOpen(panel.hidden));
+ closeBtn.addEventListener('click',close);
+ panel.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close();});
+ document.addEventListener('click',e=>{if(!panel.hidden&&!e.target.closest('#jump-nav'))close();});
+})();
 renderRecipes();renderSalads();renderShop();renderToday();save();
 // К каждому приёму пищи в исходном меню добавляем переход к рецепту.
 const mainTable=document.querySelector('#menu + p + .scroll table');
@@ -342,5 +357,23 @@ save=function(){localSave();window.dispatchEvent(new Event('recipe-change'));};
 <p><b>Солёная сельдь:</b> в меню небольшая порция 60–80 г филе на человека, дополненная яйцом и гарниром. Это размер порции для блюда, а не специальный медицинский предел. Выбирайте готовый продукт с понятным сроком годности; картофель и овощи к нему не досаливайте. <b>Открытые консервы и сельдь</b> храните по инструкции производителя в холодильнике; для этого меню удобнее открывать упаковку на один приём пищи.</p>
 <h3>Простые замены и разнообразие</h3><p>Индейку можно заменить курицей; дорогой лосось — горбушей или форелью, чередуя виды. Булгур — гречкой; свежие овощи — замороженными. Йогуртовый соус меняйте: укроп с лимоном или чеснок по вкусу. Любимый десерт тоже может быть частью питания: не нужно компенсировать его пропуском еды. Печени, болгарского перца, кинзы, брокколи, цветной капусты, петрушки и минтая в плане нет.</p>
 <footer>Меню составлено как практический семейный план. Медицинские рекомендации сверены с CDC, FDA/EPA, NHS и FoodSafety.gov 7 октября 2026 года. Рецепты и время приготовления — ориентировочные; конкретная техника, размеры кусочков и аппетит влияют на результат.</footer>
-</main><script src="./supabase-2.117.2.js"></script><script src="./cloud.js?v=empty-body-20261009"></script><script src="./pwa.js"></script></body></html>
+</main>
+<div id="jump-nav" class="no-print">
+<div id="jump-nav-panel" role="dialog" aria-label="Навигация по разделам" hidden>
+<p class="jump-nav-title">Разделы</p>
+<nav>
+<a href="#today">Рецепты дня</a>
+<a href="#base">Порции и ГВ</a>
+<a href="#menu">Обеды и ужины</a>
+<a href="#breakfast">30 завтраков</a>
+<a href="#recipes">Все рецепты</a>
+<a href="#salads">Салаты</a>
+<a href="#shop">Список покупок</a>
+<a href="#storage">Хранение</a>
+</nav>
+<button type="button" id="jump-nav-close">Закрыть</button>
+</div>
+<button type="button" id="jump-nav-toggle" aria-expanded="false" aria-controls="jump-nav-panel" title="Навигация по разделам" aria-label="Открыть навигацию по разделам">☰</button>
+</div>
+<script src="./supabase-2.117.2.js"></script><script src="./cloud.js?v=empty-body-20261009"></script><script src="./pwa.js"></script></body></html>
 
